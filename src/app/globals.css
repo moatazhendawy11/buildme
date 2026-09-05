@@ -19,6 +19,13 @@
   }
 }
 
+html,
+body {
+  /* Wide content (e.g. tables) scrolls inside its own container; the
+     page itself must never scroll sideways. */
+  overflow-x: hidden;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

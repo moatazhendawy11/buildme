@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ScoreBadge } from "@/components/ScoreBadge";
+import { StatusBadge } from "@/components/StatusBadge";
 import { calculateScore, ratingProgress } from "@/lib/scoring-model";
 import { useInitiatives, useScoringModel } from "@/lib/storage";
 import type { Initiative, ScoringModel } from "@/lib/types";
@@ -98,46 +100,85 @@ function InitiativeSection({
   description?: string;
   items: ReturnType<typeof rank>;
 }) {
+  const router = useRouter();
+
   return (
-    <section>
+    <section className="min-w-0">
       <h2 className="text-sm font-semibold text-gray-900">{title}</h2>
       {description && (
         <p className="mt-0.5 text-sm text-gray-500">{description}</p>
       )}
-      <ul className="mt-3 flex flex-col gap-3">
-        {items.map(({ initiative, score, progress }) => (
-          <li key={initiative.id}>
-            <Link
-              href={`/initiatives/${initiative.id}`}
-              className="group block rounded-lg border border-gray-200 px-4 py-3 transition-colors hover:border-gray-400 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900"
-            >
-              <div className="flex items-center justify-between gap-4">
-                <span className="font-medium text-gray-900 group-hover:underline">
-                  {initiative.name}
-                </span>
-                <div className="flex shrink-0 items-center gap-2">
-                  <ScoreBadge score={score} progress={progress} />
-                  <svg
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    className="size-4 text-gray-400 group-hover:text-gray-600"
-                    aria-hidden="true"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M7.21 14.77a.75.75 0 0 1 .02-1.06L11.168 10 7.23 6.29a.75.75 0 1 1 1.04-1.08l4.5 4.25a.75.75 0 0 1 0 1.08l-4.5 4.25a.75.75 0 0 1-1.06-.02Z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-              </div>
-              <p className="mt-1 line-clamp-1 text-sm text-gray-500">
-                {initiative.objective}
-              </p>
-            </Link>
-          </li>
-        ))}
-      </ul>
+      <div className="mt-3 overflow-x-auto rounded-lg border border-gray-200">
+        <table className="w-full min-w-[640px] text-left text-sm">
+          <thead>
+            <tr className="border-b border-gray-200 text-xs font-medium tracking-wide text-gray-500">
+              <th scope="col" className="px-4 py-2">
+                Initiative
+              </th>
+              <th scope="col" className="px-4 py-2">
+                Score
+              </th>
+              <th scope="col" className="px-4 py-2">
+                Owner
+              </th>
+              <th scope="col" className="px-4 py-2">
+                Status
+              </th>
+              <th scope="col" className="w-8 px-2 py-2">
+                <span className="sr-only">Open</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map(({ initiative, score, progress }) => {
+              const href = `/initiatives/${initiative.id}`;
+              return (
+                <tr
+                  key={initiative.id}
+                  onClick={() => router.push(href)}
+                  className="cursor-pointer border-b border-gray-100 last:border-0 hover:bg-gray-50"
+                >
+                  <td className="px-4 py-3">
+                    <Link
+                      href={href}
+                      onClick={(e) => e.stopPropagation()}
+                      className="font-medium text-gray-900 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900"
+                    >
+                      {initiative.name}
+                    </Link>
+                    <p className="mt-0.5 line-clamp-1 text-gray-500">
+                      {initiative.objective}
+                    </p>
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-3">
+                    <ScoreBadge score={score} progress={progress} />
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap text-gray-700">
+                    {initiative.owner}
+                  </td>
+                  <td className="px-4 py-3">
+                    <StatusBadge status={initiative.status} />
+                  </td>
+                  <td className="px-2 py-3 text-gray-400">
+                    <svg
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      className="size-4"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M7.21 14.77a.75.75 0 0 1 .02-1.06L11.168 10 7.23 6.29a.75.75 0 1 1 1.04-1.08l4.5 4.25a.75.75 0 0 1 0 1.08l-4.5 4.25a.75.75 0 0 1-1.06-.02Z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </section>
   );
 }

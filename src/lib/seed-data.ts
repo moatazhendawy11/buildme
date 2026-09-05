@@ -22,6 +22,7 @@ export const SEED_INITIATIVES: Initiative[] = [
     },
     recommendation: "Recommend building next quarter; low risk, clear upside.",
     decisionNote: "",
+    status: "recommended",
     isSample: true,
     createdAt: now,
     updatedAt: now,
@@ -45,6 +46,7 @@ export const SEED_INITIATIVES: Initiative[] = [
     recommendation: "",
     decisionNote:
       "Waiting on Engineering to confirm carrier API access before we can estimate delivery confidence.",
+    status: "under-review",
     isSample: true,
     createdAt: now,
     updatedAt: now,

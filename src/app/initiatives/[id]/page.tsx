@@ -3,6 +3,7 @@
 import { use } from "react";
 import Link from "next/link";
 import { ScoreBadge } from "@/components/ScoreBadge";
+import { StatusBadge } from "@/components/StatusBadge";
 import { calculateScore, ratingProgress } from "@/lib/scoring-model";
 import { useInitiatives, useScoringModel } from "@/lib/storage";
 import type { Rating } from "@/lib/types";
@@ -54,8 +55,8 @@ export default function InitiativeDetailPage({
         ← Back to initiatives
       </Link>
 
-      <div className="mt-4 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-2">
           <h1 className="text-2xl font-semibold tracking-tight">
             {initiative.name}
           </h1>
@@ -64,6 +65,7 @@ export default function InitiativeDetailPage({
               Sample
             </span>
           )}
+          <StatusBadge status={initiative.status} />
         </div>
         <ScoreBadge score={score} progress={progress} />
       </div>

@@ -1,5 +1,12 @@
 export type Rating = 0 | 1 | 2 | 3 | 4 | 5;
 
+/** PM/leadership decision status. Independent of assessment completeness. */
+export type InitiativeStatus =
+  | "under-review"
+  | "recommended"
+  | "not-recommended"
+  | "decided";
+
 export interface Criterion {
   id: string;
   name: string;
@@ -33,6 +40,7 @@ export interface Initiative {
   ratings: Record<string, Rating | null>;
   recommendation: string;
   decisionNote: string;
+  status: InitiativeStatus;
   /** True for the two preloaded fictional examples, so the UI can label them clearly. */
   isSample: boolean;
   createdAt: string;
