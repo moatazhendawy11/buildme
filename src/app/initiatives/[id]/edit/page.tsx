@@ -50,7 +50,7 @@ export default function EditInitiativePage({
       item.id === id ? { ...item, ...values, updatedAt: now } : item
     );
     setInitiatives(updated);
-    router.push(`/initiatives/${id}`);
+    router.push(`/initiatives/${id}?saved=updated`);
   }
 
   return (

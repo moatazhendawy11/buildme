@@ -47,7 +47,7 @@ export default function NewInitiativePage() {
     };
 
     setInitiatives([...initiatives!, newInitiative]);
-    router.push(`/initiatives/${newInitiative.id}`);
+    router.push(`/initiatives/${newInitiative.id}?saved=created`);
   }
 
   return (

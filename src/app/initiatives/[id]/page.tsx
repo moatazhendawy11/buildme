@@ -1,8 +1,8 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AssessmentFields } from "@/components/AssessmentFields";
 import { ScoreBadge } from "@/components/ScoreBadge";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -17,9 +17,24 @@ export default function InitiativeDetailPage({
 }) {
   const { id } = use(params);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [initiatives, setInitiatives] = useInitiatives();
   const [model] = useScoringModel();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [savedBanner, setSavedBanner] = useState<"created" | "updated" | null>(
+    () => {
+      const value = searchParams.get("saved");
+      return value === "created" || value === "updated" ? value : null;
+    }
+  );
+
+  useEffect(() => {
+    if (searchParams.get("saved")) {
+      router.replace(`/initiatives/${id}`, { scroll: false });
+    }
+    // Only ever needs to run once, right after a redirect that set ?saved=.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (initiatives === null || model === null) {
     return (
@@ -72,6 +87,32 @@ export default function InitiativeDetailPage({
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
+      {savedBanner && (
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-md border border-green-200 bg-green-50 px-4 py-3">
+          <p className="text-sm font-medium text-green-800">
+            ✓{" "}
+            {savedBanner === "created"
+              ? "Initiative created successfully."
+              : "Changes saved successfully."}
+          </p>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/"
+              className="rounded-md bg-green-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-800"
+            >
+              Back to initiatives list
+            </Link>
+            <button
+              type="button"
+              onClick={() => setSavedBanner(null)}
+              className="text-sm font-medium text-green-800 hover:underline"
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
+
       <Link href="/" className="text-sm text-gray-500 hover:text-gray-900">
         ← Back to initiatives
       </Link>
