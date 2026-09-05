@@ -35,6 +35,8 @@ export interface Initiative {
   proposedSolution: string;
   owner: string;
   objective: string;
+  /** Which KPI/metric this initiative is meant to move. */
+  kpi: string;
   expectedKpiOutcomes: string;
   /** Keyed by criterion id. `null` means not yet rated (unassessed, not zero). */
   ratings: Record<string, Rating | null>;

@@ -77,8 +77,9 @@ export default function InitiativeDetailPage({
         <Field label="Proposed solution" value={initiative.proposedSolution} />
         <Field label="Owner" value={initiative.owner} />
         <Field label="Objective" value={initiative.objective} />
+        <Field label="KPI affected" value={initiative.kpi} />
         <Field
-          label="Expected KPI outcomes"
+          label="Expected KPI outcome"
           value={initiative.expectedKpiOutcomes}
         />
       </dl>

@@ -12,6 +12,7 @@ export const SEED_INITIATIVES: Initiative[] = [
       "Add a \"Reorder\" button on past orders that re-adds all items to the cart in one click, with substitutions offered for anything out of stock.",
     owner: "Priya Shah (PM, Growth)",
     objective: "Increase repeat purchase rate among existing customers.",
+    kpi: "Repeat purchase rate",
     expectedKpiOutcomes:
       "+5% repeat purchase rate within 2 quarters of launch.",
     ratings: {
@@ -36,6 +37,7 @@ export const SEED_INITIATIVES: Initiative[] = [
       "Integrate carrier live-tracking APIs and show real-time status and estimated delivery on the order page.",
     owner: "Marcus Lee (PM, Logistics)",
     objective: "Reduce \"where is my order\" (WISMO) support contacts.",
+    kpi: "WISMO support ticket volume",
     expectedKpiOutcomes: "-20% WISMO support tickets within one quarter.",
     ratings: {
       "business-impact": 3,

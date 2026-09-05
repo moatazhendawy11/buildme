@@ -138,13 +138,20 @@ function InitiativeSection({
                   className="cursor-pointer border-b border-gray-100 last:border-0 hover:bg-gray-50"
                 >
                   <td className="px-4 py-3">
-                    <Link
-                      href={href}
-                      onClick={(e) => e.stopPropagation()}
-                      className="font-medium text-gray-900 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900"
-                    >
-                      {initiative.name}
-                    </Link>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Link
+                        href={href}
+                        onClick={(e) => e.stopPropagation()}
+                        className="font-medium text-gray-900 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900"
+                      >
+                        {initiative.name}
+                      </Link>
+                      {initiative.isSample && (
+                        <span className="shrink-0 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
+                          Sample
+                        </span>
+                      )}
+                    </div>
                     <p className="mt-0.5 line-clamp-1 text-gray-500">
                       {initiative.objective}
                     </p>
