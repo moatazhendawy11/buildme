@@ -1,10 +1,4 @@
-export function ScoreBadge({
-  score,
-  progress,
-}: {
-  score: number | null;
-  progress: { rated: number; total: number };
-}) {
+export function ScoreBadge({ score }: { score: number | null }) {
   if (score !== null) {
     return (
       <span className="shrink-0 rounded-full bg-gray-900 px-2.5 py-0.5 text-sm font-semibold text-white">
@@ -15,7 +9,7 @@ export function ScoreBadge({
 
   return (
     <span className="shrink-0 rounded-full bg-amber-100 px-2.5 py-0.5 text-sm font-medium text-amber-800">
-      Incomplete — {progress.rated}/{progress.total} rated
+      Incomplete
     </span>
   );
 }

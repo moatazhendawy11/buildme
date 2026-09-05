@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ScoreBadge } from "@/components/ScoreBadge";
 import { StatusBadge } from "@/components/StatusBadge";
-import { calculateScore, ratingProgress } from "@/lib/scoring-model";
+import { calculateScore } from "@/lib/scoring-model";
 import { useInitiatives, useScoringModel } from "@/lib/storage";
 import type { Initiative, ScoringModel } from "@/lib/types";
 
@@ -86,7 +86,6 @@ function rank(items: Initiative[], model: ScoringModel) {
     .map((initiative) => ({
       initiative,
       score: calculateScore(initiative, model),
-      progress: ratingProgress(initiative, model),
     }))
     .sort((a, b) => (b.score ?? -1) - (a.score ?? -1));
 }
@@ -130,7 +129,7 @@ function InitiativeSection({
             </tr>
           </thead>
           <tbody>
-            {items.map(({ initiative, score, progress }) => {
+            {items.map(({ initiative, score }) => {
               const href = `/initiatives/${initiative.id}`;
               return (
                 <tr
@@ -151,7 +150,7 @@ function InitiativeSection({
                     </p>
                   </td>
                   <td className="whitespace-nowrap px-4 py-3">
-                    <ScoreBadge score={score} progress={progress} />
+                    <ScoreBadge score={score} />
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-gray-700">
                     {initiative.owner}

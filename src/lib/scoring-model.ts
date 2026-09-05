@@ -102,11 +102,3 @@ export function calculateScore(
 
   return Math.round(total * 100);
 }
-
-export function ratingProgress(initiative: Initiative, model: ScoringModel) {
-  const criteria = allCriteria(model);
-  const rated = criteria.filter(
-    (criterion) => initiative.ratings[criterion.id] != null
-  ).length;
-  return { rated, total: criteria.length };
-}
