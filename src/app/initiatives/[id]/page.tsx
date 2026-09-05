@@ -66,7 +66,10 @@ export default function InitiativeDetailPage({
           )}
           <StatusBadge status={initiative.status} />
         </div>
-        <ScoreBadge score={score} />
+        <div className="text-right">
+          <p className="text-xs font-medium text-gray-500">Score</p>
+          <ScoreBadge score={score} />
+        </div>
       </div>
 
       <dl className="mt-8 flex flex-col gap-6">
