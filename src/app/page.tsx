@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ScoreBadge } from "@/components/ScoreBadge";
 import { calculateScore, ratingProgress } from "@/lib/scoring-model";
 import { useInitiatives, useScoringModel } from "@/lib/storage";
 
@@ -64,21 +65,27 @@ export default function InitiativeListPage() {
             <li key={initiative.id}>
               <Link
                 href={`/initiatives/${initiative.id}`}
-                className="block rounded-lg border border-gray-200 px-4 py-3 hover:border-gray-400"
+                className="group block rounded-lg border border-gray-200 px-4 py-3 transition-colors hover:border-gray-400 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900"
               >
                 <div className="flex items-center justify-between gap-4">
-                  <span className="font-medium text-gray-900">
+                  <span className="font-medium text-gray-900 group-hover:underline">
                     {initiative.name}
                   </span>
-                  {score !== null ? (
-                    <span className="shrink-0 rounded-full bg-gray-900 px-2.5 py-0.5 text-sm font-semibold text-white">
-                      {score}
-                    </span>
-                  ) : (
-                    <span className="shrink-0 rounded-full bg-gray-100 px-2.5 py-0.5 text-sm text-gray-600">
-                      {progress.rated}/{progress.total} rated
-                    </span>
-                  )}
+                  <div className="flex shrink-0 items-center gap-2">
+                    <ScoreBadge score={score} progress={progress} />
+                    <svg
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      className="size-4 text-gray-400 group-hover:text-gray-600"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M7.21 14.77a.75.75 0 0 1 .02-1.06L11.168 10 7.23 6.29a.75.75 0 1 1 1.04-1.08l4.5 4.25a.75.75 0 0 1 0 1.08l-4.5 4.25a.75.75 0 0 1-1.06-.02Z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
                 </div>
                 <p className="mt-1 line-clamp-1 text-sm text-gray-500">
                   {initiative.objective}

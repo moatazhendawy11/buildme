@@ -2,7 +2,8 @@
 
 import { use } from "react";
 import Link from "next/link";
-import { calculateScore } from "@/lib/scoring-model";
+import { ScoreBadge } from "@/components/ScoreBadge";
+import { calculateScore, ratingProgress } from "@/lib/scoring-model";
 import { useInitiatives, useScoringModel } from "@/lib/storage";
 import type { Rating } from "@/lib/types";
 
@@ -45,6 +46,7 @@ export default function InitiativeDetailPage({
   }
 
   const score = calculateScore(initiative, model);
+  const progress = ratingProgress(initiative, model);
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
@@ -56,11 +58,7 @@ export default function InitiativeDetailPage({
         <h1 className="text-2xl font-semibold tracking-tight">
           {initiative.name}
         </h1>
-        {score !== null && (
-          <span className="shrink-0 rounded-full bg-gray-900 px-3 py-1 text-sm font-semibold text-white">
-            Score: {score}
-          </span>
-        )}
+        <ScoreBadge score={score} progress={progress} />
       </div>
 
       <dl className="mt-8 flex flex-col gap-6">
