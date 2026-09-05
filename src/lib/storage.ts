@@ -24,15 +24,20 @@ function writeToStorage<T>(key: string, value: T) {
 }
 
 /**
- * Sample initiatives aren't user-editable yet, so it's always safe to
- * refresh them to the current seed definition — this repairs locally
- * stored copies from before a data-model change without touching any
- * real initiative the user created.
+ * Backfills fields missing from an older locally-stored initiative
+ * (from before a data-model change added them) using the matching
+ * seed's values, without touching any field the stored copy already
+ * has. This must only fill gaps, never overwrite — initiatives
+ * (including samples) are user-editable and deletable, so anything
+ * more aggressive would silently revert an edit or resurrect a
+ * deleted sample.
  */
-function refreshSeeds(stored: Initiative[]): Initiative[] {
-  const seedIds = new Set(SEED_INITIATIVES.map((seed) => seed.id));
-  const realInitiatives = stored.filter((item) => !seedIds.has(item.id));
-  return [...SEED_INITIATIVES, ...realInitiatives];
+function backfillFromSeed(stored: Initiative[]): Initiative[] {
+  const seedById = new Map(SEED_INITIATIVES.map((seed) => [seed.id, seed]));
+  return stored.map((item) => {
+    const seed = seedById.get(item.id);
+    return seed ? { ...seed, ...item } : item;
+  });
 }
 
 /**
@@ -45,7 +50,7 @@ export function useInitiatives() {
   useEffect(() => {
     const hasExisting = window.localStorage.getItem(INITIATIVES_KEY) != null;
     const stored = readFromStorage(INITIATIVES_KEY, SEED_INITIATIVES);
-    const merged = hasExisting ? refreshSeeds(stored) : stored;
+    const merged = hasExisting ? backfillFromSeed(stored) : stored;
     writeToStorage(INITIATIVES_KEY, merged);
     setInitiatives(merged);
   }, []);

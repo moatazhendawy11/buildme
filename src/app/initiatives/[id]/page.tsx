@@ -1,7 +1,8 @@
 "use client";
 
-import { use } from "react";
+import { use, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ScoreBadge } from "@/components/ScoreBadge";
 import { StatusBadge } from "@/components/StatusBadge";
 import { calculateScore } from "@/lib/scoring-model";
@@ -14,8 +15,10 @@ export default function InitiativeDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const [initiatives] = useInitiatives();
+  const router = useRouter();
+  const [initiatives, setInitiatives] = useInitiatives();
   const [model] = useScoringModel();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   if (initiatives === null || model === null) {
     return (
@@ -48,6 +51,11 @@ export default function InitiativeDetailPage({
 
   const score = calculateScore(initiative, model);
 
+  function handleDelete() {
+    setInitiatives(initiatives!.filter((item) => item.id !== id));
+    router.push("/");
+  }
+
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
       <Link href="/" className="text-sm text-gray-500 hover:text-gray-900">
@@ -71,6 +79,59 @@ export default function InitiativeDetailPage({
           <ScoreBadge score={score} />
         </div>
       </div>
+
+      <div className="mt-4 flex items-center gap-3">
+        <Link
+          href={`/initiatives/${id}/edit`}
+          className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+        >
+          Edit
+        </Link>
+        <button
+          type="button"
+          onClick={() => setShowDeleteConfirm(true)}
+          className="rounded-md border border-red-300 px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-50"
+        >
+          Delete
+        </button>
+      </div>
+
+      {showDeleteConfirm && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-dialog-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+        >
+          <div className="w-full max-w-sm rounded-lg bg-white p-6 shadow-lg">
+            <h2
+              id="delete-dialog-title"
+              className="text-lg font-semibold text-gray-900"
+            >
+              Delete &ldquo;{initiative.name}&rdquo;?
+            </h2>
+            <p className="mt-2 text-sm text-gray-500">
+              This can&apos;t be undone.
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirm(false)}
+                className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDelete}
+                className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <dl className="mt-8 flex flex-col gap-6">
         <Field label="Problem" value={initiative.problem} />
