@@ -1,16 +1,24 @@
 "use client";
 
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ScoreBadge } from "@/components/ScoreBadge";
 import { StatusBadge } from "@/components/StatusBadge";
+import { downloadCsv } from "@/lib/csv";
+import { buildInitiativeCsvTemplate, parseInitiativesCsv } from "@/lib/csv-initiatives";
 import { calculateScore } from "@/lib/scoring-model";
 import { useInitiatives, useScoringModel } from "@/lib/storage";
 import type { Initiative, ScoringModel } from "@/lib/types";
 
 export default function InitiativeListPage() {
-  const [initiatives] = useInitiatives();
+  const [initiatives, setInitiatives] = useInitiatives();
   const [model] = useScoringModel();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [importBanner, setImportBanner] = useState<{
+    type: "success" | "error";
+    lines: string[];
+  } | null>(null);
 
   if (initiatives === null || model === null) {
     return (
@@ -29,9 +37,84 @@ export default function InitiativeListPage() {
     model
   );
 
+  function handleDownloadTemplate() {
+    downloadCsv("buildme-initiatives-template.csv", buildInitiativeCsvTemplate(model!));
+  }
+
+  function handleUploadClick() {
+    fileInputRef.current?.click();
+  }
+
+  function handleFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // allow re-selecting the same file next time
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const text = String(reader.result ?? "");
+      const { initiatives: imported, errors } = parseInitiativesCsv(text, model!);
+
+      if (imported.length === 0) {
+        setImportBanner({
+          type: "error",
+          lines: errors.length
+            ? errors
+            : ["No initiatives could be imported from that file."],
+        });
+        return;
+      }
+
+      setInitiatives([...initiatives!, ...imported]);
+
+      const summary = `Imported ${imported.length} initiative${imported.length === 1 ? "" : "s"}.`;
+      const shownErrors = errors.slice(0, 5);
+      const extra =
+        errors.length > shownErrors.length
+          ? [`…and ${errors.length - shownErrors.length} more.`]
+          : [];
+      setImportBanner({ type: "success", lines: [summary, ...shownErrors, ...extra] });
+    };
+    reader.readAsText(file);
+  }
+
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
-      <div className="flex items-center justify-between gap-4">
+      {importBanner && (
+        <div
+          className={`mb-6 rounded-md border px-4 py-3 ${
+            importBanner.type === "success"
+              ? "border-green-200 bg-green-50"
+              : "border-red-200 bg-red-50"
+          }`}
+        >
+          <div className="flex items-start justify-between gap-4">
+            <div
+              className={`text-sm ${
+                importBanner.type === "success" ? "text-green-800" : "text-red-800"
+              }`}
+            >
+              {importBanner.lines.map((line, i) => (
+                <p key={i} className={i === 0 ? "font-medium" : "mt-1"}>
+                  {i === 0 && importBanner.type === "success" ? "✓ " : ""}
+                  {line}
+                </p>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => setImportBanner(null)}
+              className={`shrink-0 text-sm font-medium hover:underline ${
+                importBanner.type === "success" ? "text-green-800" : "text-red-800"
+              }`}
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">
             Initiatives
@@ -40,12 +123,35 @@ export default function InitiativeListPage() {
             Compare proposed initiatives under a shared scoring model.
           </p>
         </div>
-        <Link
-          href="/initiatives/new"
-          className="shrink-0 rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-700"
-        >
-          + New initiative
-        </Link>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={handleDownloadTemplate}
+            className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            Download template (CSV)
+          </button>
+          <button
+            type="button"
+            onClick={handleUploadClick}
+            className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            Upload CSV
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".csv,text/csv"
+            onChange={handleFileSelected}
+            className="hidden"
+          />
+          <Link
+            href="/initiatives/new"
+            className="shrink-0 rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-700"
+          >
+            + New initiative
+          </Link>
+        </div>
       </div>
 
       {initiatives.length === 0 ? (
