@@ -3,6 +3,7 @@
 import { use, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { AssessmentFields } from "@/components/AssessmentFields";
 import { ScoreBadge } from "@/components/ScoreBadge";
 import { StatusBadge } from "@/components/StatusBadge";
 import { calculateScore } from "@/lib/scoring-model";
@@ -54,6 +55,19 @@ export default function InitiativeDetailPage({
   function handleDelete() {
     setInitiatives(initiatives!.filter((item) => item.id !== id));
     router.push("/");
+  }
+
+  function handleRatingChange(criterionId: string, value: Rating | null) {
+    const updated = initiatives!.map((item) =>
+      item.id === id
+        ? {
+            ...item,
+            ratings: { ...item.ratings, [criterionId]: value },
+            updatedAt: new Date().toISOString(),
+          }
+        : item
+    );
+    setInitiatives(updated);
   }
 
   return (
@@ -148,45 +162,17 @@ export default function InitiativeDetailPage({
       <h2 className="mt-10 text-lg font-semibold tracking-tight">
         Assessment
       </h2>
-      <div className="mt-4 flex flex-col gap-6">
-        {model.themes.map((theme) => (
-          <div key={theme.id}>
-            <h3 className="text-sm font-semibold text-gray-900">
-              {theme.name}{" "}
-              <span className="font-normal text-gray-500">
-                ({theme.weight}% of score)
-              </span>
-            </h3>
-            <ul className="mt-2 flex flex-col gap-2">
-              {theme.criteria.map((criterion) => {
-                const rating = initiative.ratings[criterion.id] as
-                  | Rating
-                  | null
-                  | undefined;
-                return (
-                  <li
-                    key={criterion.id}
-                    className="rounded-md border border-gray-200 px-3 py-2"
-                  >
-                    <div className="flex items-center justify-between gap-4">
-                      <span className="text-sm font-medium text-gray-900">
-                        {criterion.name}
-                      </span>
-                      <span className="text-sm text-gray-500">
-                        {rating != null ? `${rating}/5` : "Not rated"}
-                      </span>
-                    </div>
-                    {rating != null && (
-                      <p className="mt-1 text-sm text-gray-500">
-                        {criterion.ratingDefinitions[rating]}
-                      </p>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        ))}
+      <p className="mt-1 text-sm text-gray-500">
+        Rate each criterion 0-5. Leave a criterion unrated if it hasn&apos;t
+        been assessed yet — the score only appears once every criterion has
+        a rating.
+      </p>
+      <div className="mt-4">
+        <AssessmentFields
+          model={model}
+          ratings={initiative.ratings}
+          onChange={handleRatingChange}
+        />
       </div>
 
       {(initiative.recommendation || initiative.decisionNote) && (

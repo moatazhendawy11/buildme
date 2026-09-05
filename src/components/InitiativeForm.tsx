@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { AssessmentFields } from "@/components/AssessmentFields";
+import type { Rating, ScoringModel } from "@/lib/types";
 
 export interface InitiativeFormValues {
   name: string;
@@ -23,11 +25,18 @@ export function InitiativeForm({
   onSubmit,
   cancelHref,
   submitLabel,
+  assessment,
 }: {
   initialValues?: Partial<InitiativeFormValues>;
   onSubmit: (values: InitiativeFormValues) => void;
   cancelHref: string;
   submitLabel: string;
+  /** When provided, renders an editable assessment section before Save/Cancel. */
+  assessment?: {
+    model: ScoringModel;
+    ratings: Record<string, Rating | null | undefined>;
+    onChange: (criterionId: string, value: Rating | null) => void;
+  };
 }) {
   const [name, setName] = useState(initialValues?.name ?? "");
   const [problem, setProblem] = useState(initialValues?.problem ?? "");
@@ -137,6 +146,24 @@ export function InitiativeForm({
           className={inputClass}
         />
       </FormField>
+
+      {assessment && (
+        <div>
+          <h2 className="text-sm font-medium text-gray-900">Assessment</h2>
+          <p className="mt-1 text-sm text-gray-500">
+            Optional — rate each criterion 0-5 now, or leave unrated and
+            come back later. The score only appears once every criterion
+            has a rating.
+          </p>
+          <div className="mt-3">
+            <AssessmentFields
+              model={assessment.model}
+              ratings={assessment.ratings}
+              onChange={assessment.onChange}
+            />
+          </div>
+        </div>
+      )}
 
       <div className="mt-2 flex items-center gap-3">
         <button

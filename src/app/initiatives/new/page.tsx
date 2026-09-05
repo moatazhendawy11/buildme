@@ -1,15 +1,17 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { InitiativeForm, type InitiativeFormValues } from "@/components/InitiativeForm";
 import { useInitiatives, useScoringModel } from "@/lib/storage";
-import type { Initiative } from "@/lib/types";
+import type { Initiative, Rating } from "@/lib/types";
 
 export default function NewInitiativePage() {
   const router = useRouter();
   const [initiatives, setInitiatives] = useInitiatives();
   const [model] = useScoringModel();
+  const [ratings, setRatings] = useState<Record<string, Rating | null>>({});
 
   if (initiatives === null || model === null) {
     return (
@@ -19,19 +21,23 @@ export default function NewInitiativePage() {
     );
   }
 
+  function handleRatingChange(criterionId: string, value: Rating | null) {
+    setRatings((prev) => ({ ...prev, [criterionId]: value }));
+  }
+
   function handleCreate(values: InitiativeFormValues) {
     const now = new Date().toISOString();
-    const ratings: Record<string, null> = {};
+    const fullRatings: Record<string, Rating | null> = {};
     model!.themes.forEach((theme) => {
       theme.criteria.forEach((criterion) => {
-        ratings[criterion.id] = null;
+        fullRatings[criterion.id] = ratings[criterion.id] ?? null;
       });
     });
 
     const newInitiative: Initiative = {
       id: crypto.randomUUID(),
       ...values,
-      ratings,
+      ratings: fullRatings,
       recommendation: "",
       decisionNote: "",
       status: "under-review",
@@ -54,8 +60,7 @@ export default function NewInitiativePage() {
         New initiative
       </h1>
       <p className="mt-1 text-sm text-gray-500">
-        Capture the basics now — ratings and scoring settings come in a
-        later milestone.
+        Capture the basics, and rate it now if you&apos;re ready to.
       </p>
 
       <div className="mt-8">
@@ -63,6 +68,7 @@ export default function NewInitiativePage() {
           onSubmit={handleCreate}
           cancelHref="/"
           submitLabel="Save initiative"
+          assessment={{ model, ratings, onChange: handleRatingChange }}
         />
       </div>
     </main>
