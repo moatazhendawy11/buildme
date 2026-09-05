@@ -55,9 +55,16 @@ export default function InitiativeDetailPage({
       </Link>
 
       <div className="mt-4 flex items-center justify-between gap-4">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {initiative.name}
-        </h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {initiative.name}
+          </h1>
+          {initiative.isSample && (
+            <span className="shrink-0 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
+              Sample
+            </span>
+          )}
+        </div>
         <ScoreBadge score={score} progress={progress} />
       </div>
 

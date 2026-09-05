@@ -33,6 +33,8 @@ export interface Initiative {
   ratings: Record<string, Rating | null>;
   recommendation: string;
   decisionNote: string;
+  /** True for the two preloaded fictional examples, so the UI can label them clearly. */
+  isSample: boolean;
   createdAt: string;
   updatedAt: string;
 }
